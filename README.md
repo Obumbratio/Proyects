@@ -1,129 +1,119 @@
-# virus_sim_game
+# Antivirus Inteligente
 
-## Safety First
-This repository contains a **fictional, educational simulation**. The so-called
-"virus" is just a game character. It never touches real files, processes, or
-networks. The program runs entirely in memory and exists to help learners think
-about defensive strategies in a playful context.
+## Aviso de seguridad
 
-## Project Overview
-`virus_sim_game` is a turn-based terminal simulation written in Python 3 using
-only the standard library. The world includes three main actor types:
+Este proyecto implementa un **antivirus educativo** orientado al análisis y a
+la remediación segura dentro del propio equipo. No elimina nada de manera
+permanente sin confirmación del usuario. No envía información a la red y está
+pensado para ejecutarse con transparencia y en modo "simulación" si así se
+requiere.
 
-- **Processes** – friendly software characters that can be temporarily
-  compromised in the simulation.
-- **Virus** – the player-controlled game entity with four abilities: camouflage,
-  replicator, adapt, and mirror. Each ability is represented as a harmless game
-  mechanic (e.g., camouflage reduces the chance of detection).
-- **Antivirus agents** – defenders that scan for the virus and repair
-  compromised processes.
+## Características principales
 
-All of the logic lives in four modules:
+- **Escaneo modular** de archivos, procesos, procesos GPU y archivos
+  duplicados.
+- **Reportes detallados** por tipo de escaneo y reporte maestro del escaneo
+  completo en formato JSON (o texto si se configura).
+- **Modo simulación (`--dry-run`)** para revisar qué acciones se realizarían sin
+  modificar el sistema.
+- **Cuarentena y remediación segura** con registro de todas las acciones.
+- **Búsqueda de duplicados** mediante hash incremental para optimizar el uso de
+  disco.
+- **Detección heurística** con reglas simples y base de firmas extensible.
+- **Limpieza de cachés y recomendaciones de optimización** no destructivas.
+- **Interfaz por consola** con menú interactivo y comandos directos.
+- **Registro rotativo** y configuración externa mediante `config/default_config.json`.
+- **Pruebas unitarias** para los componentes críticos (`files`, `dupes`,
+  `heuristics`, `report`).
 
-| File | Purpose |
-| ---- | ------- |
-| `entities.py` | Defines the `Process`, `Virus`, `Antivirus`, and `World` classes. |
-| `scenarios.py` | Provides preset scenarios and deterministic showcase runs. |
-| `simulate.py` | Command-line interface for running simulations. |
-| `README.md` | Project documentation (this file). |
+## Requisitos
 
-## Getting Started
-1. Ensure Python 3.8+ is installed.
-2. Clone or download this repository.
-3. From the project directory run one of the scenarios:
+- Python 3.9 o superior.
+- Dependencias estándar de la biblioteca estándar. El uso de `psutil` es
+  opcional; si no está disponible, se usan rutas alternativas seguras.
 
-```bash
-python simulate.py --scenario basic --turns 20
-```
-
-The `--turns` flag controls how many rounds to simulate, `--seed` can lock in a
-random seed, and `--no-explanation` hides the ability explanation text if you
-want a shorter log.
-
-### Game Ability Guide
-The program also prints this explanation by default to help newcomers map the
-abilities to familiar videogame mechanics:
-
-- **Camouflage** – like equipping a stealth cloak; scanners have a harder time
-  seeing the virus, but it is never invisible.
-- **Replicator** – similar to summoning allies; the virus can spawn extra clones
-  that obey the same rules.
-- **Adapt** – comparable to leveling up a defense skill after dodging attacks;
-  each missed scan makes the virus slightly harder to catch.
-- **Mirror** – reminiscent of a shapeshifter that mimics other characters to
-  confuse opponents and reduce detection odds.
-
-## Deterministic Showcase Runs
-To highlight how each ability influences outcomes, run the showcase mode:
+## Instalación
 
 ```bash
-python simulate.py --showcase
+python -m venv .venv
+source .venv/bin/activate  # En Windows: .venv\Scripts\activate
+pip install --upgrade pip
 ```
 
-This produces unit-test-like deterministic summaries using fixed random seeds.
-Each block reports the same results on every machine, making it easy to compare
-ability combinations.
+No se requieren paquetes adicionales para ejecutar las funcionalidades básicas.
 
-## Example Output (100 turns)
-Below is trimmed output from running the basic scenario for 100 turns. The
-random seed is locked so you can reproduce the same events:
+## Uso
+
+Ejecute el menú interactivo:
 
 ```bash
-python simulate.py --scenario basic --turns 100 --seed 2024
+python main.py
 ```
 
-<details>
-<summary>Sample log</summary>
+Comandos directos disponibles:
 
-```
-Game Ability Guide:
-  Camouflage  -> Like a stealth cloak in an adventure game: it makes the
-                   virus harder to spot, but not invisible.
-  Replicator  -> Similar to summoning companions in a strategy game: the
-                   virus can spawn extra copies that follow the same rules.
-  Adapt       -> Comparable to leveling up after dodging attacks; each
-                   failed scan gives a small defensive boost.
-  Mirror      -> Think of a shapeshifter class that imitates others to
-                   confuse enemies, lowering the odds of detection.
-
--- Turn 1 --
-Edu-Virus compromised Spreadsheet (chance 0.39).
-ShieldOne scanned Edu-Virus but missed (roll 0.89 vs 0.33).
--- Turn 2 --
-Edu-Virus failed to compromise PhotoOrganizer (chance 0.43).
-ShieldOne scanned Edu-Virus but missed (roll 0.35 vs 0.31).
--- Turn 3 --
-Edu-Virus compromised MusicPlayer (chance 0.40).
-ShieldOne scanned Edu-Virus but missed (roll 0.73 vs 0.30).
--- Turn 4 --
-Edu-Virus failed to compromise PhotoOrganizer (chance 0.43).
-ShieldOne scanned Edu-Virus but missed (roll 0.53 vs 0.28).
--- Turn 5 --
-Edu-Virus failed to compromise NoteTaker (chance 0.37).
-Edu-Virus replicated into Edu-Virus-clone-1.
-ShieldOne scanned Edu-Virus but missed (roll 0.76 vs 0.26).
-...
--- Turn 100 --
-NoteTaker stabilized itself.
-Edu-Virus-clone-4 compromised NoteTaker (chance 0.38).
-ShieldOne scanned Edu-Virus-clone-13 but missed (roll 0.59 vs 0.19).
-ShieldOne repaired PhotoOrganizer.
-Simulation Summary:
-  Turns simulated: 100
-  Processes compromised: 4/5
-  Active viruses: 11
-  Neutralized viruses: 29
-  Total clone events: 39
+```bash
+python main.py full-scan --dry-run
+python main.py scan-files --path "C:/Usuarios/Nombre/Downloads"
+python main.py scan-processes
+python main.py scan-gpu
+python main.py find-dupes --paths "C:/Usuarios/Nombre/Documents" "D:/Media"
+python main.py reports --last --format json
+python main.py remediate --from-report reports/20240101T000000Z_escaneo_archivos.json
+python main.py optimize
 ```
 
-</details>
+### Modo simulación
 
-## Educational Goals
-- Demonstrate how probabilistic game mechanics can mirror cybersecurity ideas
-  without touching real systems.
-- Encourage experimentation with different ability combinations to see how
-  defenders and attackers can reach equilibrium.
-- Provide a safe sandbox for classroom activities or self-paced learning.
+Agregue `--dry-run` para que el antivirus muestre todas las acciones que
+realizaría sin aplicarlas. Esto es especialmente útil antes de ejecutar
+limpiezas o enviar elementos a cuarentena.
 
-Have fun exploring the simulation, and remember: everything here is make-believe
-and absolutely safe to run locally.
+### Configuración
+
+El archivo `config/default_config.json` define opciones seguras por defecto: 
+carpeta de reportes, directorio de cuarentena, tamaño de bloque de lectura,
+registro, etc. Puede copiar este archivo a
+`~/.intelligent_antivirus/config.json` para personalizar su instalación local.
+
+### Reportes
+
+Cada escaneo genera un archivo JSON en la carpeta `reports/`. El menú y el
+comando `python main.py reports` permiten consultar los reportes más recientes
+en formato legible o en JSON para su integración con otras herramientas.
+
+### Remediación
+
+Después de cualquier escaneo el menú ofrece:
+
+1. **Eliminar/Enviar a cuarentena** – mueve los elementos sospechosos a la
+   cuarentena (opción predeterminada) o elimina permanentemente tras
+   confirmación explícita.
+2. **Finalizar procesos sospechosos** – guía para realizar la acción de forma
+   manual y segura.
+3. **Limpiar caché** – detecta directorios temporales y ofrece limpiarlos de
+   forma segura (respeta el modo simulación).
+4. **Optimizar el sistema** – presenta recomendaciones no destructivas.
+
+Todas las acciones generan un reporte post-acción en consola y se registran en
+el archivo de log.
+
+## Desarrollo y pruebas
+
+Ejecute las pruebas automatizadas con:
+
+```bash
+python -m unittest discover -s tests
+```
+
+Los módulos están organizados en:
+
+- `core/` – lógica de escaneo, reportes, heurísticas, remediación, etc.
+- `ui/` – interfaz de usuario.
+- `tests/` – pruebas unitarias.
+
+## Licencia
+
+Este proyecto se distribuye bajo la licencia MIT (consulte el archivo
+`LICENSE`). Se proporciona **sin garantía**; utilícelo con precaución y revíse
+los reportes antes de tomar acciones permanentes.

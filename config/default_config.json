@@ -1,0 +1,25 @@
+{
+  "logging": {
+    "directory": "logs",
+    "filename": "antivirus.log",
+    "max_bytes": 1048576,
+    "backup_count": 5
+  },
+  "scanning": {
+    "max_workers": 2,
+    "block_size": 65536,
+    "follow_symlinks": false,
+    "allow_network_paths": false
+  },
+  "reports": {
+    "directory": "reports",
+    "format": "json"
+  },
+  "remediation": {
+    "quarantine_dir": "quarantine",
+    "require_confirmation": true
+  },
+  "ui": {
+    "progress_bar_width": 40
+  }
+}
